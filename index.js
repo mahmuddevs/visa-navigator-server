@@ -63,9 +63,8 @@ async function run() {
                 .find()
                 .sort({ createdAt: -1 })
                 .limit(6).toArray();
-            console.log(latestVisas)
-            return res.send(latestVisas)
 
+            return res.send(latestVisas)
         })
 
 
@@ -105,10 +104,37 @@ async function run() {
             const result = await visaCollection.findOne(query);
             return res.send(result)
         })
+
         //Update Visa
         app.put('/visas/:id', async (req, res) => {
             const id = req.params.id
-            console.log(id)
+            const updatedData = req.body
+
+            const { countryName, countryImg, visaType, processingTime, requiredDocuments, description, minAge, fee, validity, applicationMethod, user } = updatedData
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+
+            const updateDoc = {
+
+                $set: {
+                    countryName,
+                    countryImg,
+                    visaType,
+                    processingTime,
+                    requiredDocuments,
+                    description,
+                    minAge,
+                    fee,
+                    validity,
+                    applicationMethod,
+                    user
+                },
+
+            };
+
+            const result = await movies.updateOne(filter, updateDoc, options);
+
         })
 
         app.delete('/visas/:id', async (req, res) => {
