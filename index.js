@@ -33,16 +33,43 @@ async function run() {
 
             res.send(result)
         })
-        app.get('/:id', async (req, res) => {
-            const id = req.params.id
+        // app.get('/:id', async (req, res) => {
+        //     const id = req.params.id
 
-            const query = { _id: new ObjectId(id) }
+        //     const query = { _id: new ObjectId(id) }
 
-            const result = await userCollection.findOne(query);
+        //     const result = await userCollection.findOne(query);
 
-            res.send(result)
+        //     res.send(result)
+        // })
+
+
+
+
+        //Visa Routes
+
+        //Get All Visas
+        app.get('/all-visas', async (req, res) => {
+            const visas = visaCollection.find();
+            const result = await visas.toArray()
+
+            return res.send(result)
         })
 
+
+        //Get Latest Visas
+        app.get('/latest-visas', async (req, res) => {
+            const latestVisas = await visaCollection
+                .find()
+                .sort({ createdAt: -1 })
+                .limit(6).toArray();
+            console.log(latestVisas)
+            return res.send(latestVisas)
+
+        })
+
+
+        //Add visa
         app.post('/add-visa', async (req, res) => {
             const data = req.body
             const { user, countryName, visaType } = data
@@ -55,8 +82,40 @@ async function run() {
                 return res.send({ message: "Already Exists" })
             }
 
-            const result = await visaCollection.insertOne(data)
-            res.send(result)
+            const result = await visaCollection.insertOne({ ...data, createdAt: new Date() })
+            return res.send(result)
+        })
+
+        //Get Visas By Email
+        app.post('/my-visas', async (req, res) => {
+            const { email } = req.body
+
+            const query = { user: email }
+
+            const visas = visaCollection.find(query);
+            const result = await visas.toArray()
+
+            return res.send(result)
+        })
+
+        //Get Single Visa
+        app.get('/visas/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await visaCollection.findOne(query);
+            return res.send(result)
+        })
+        //Update Visa
+        app.put('/visas/:id', async (req, res) => {
+            const id = req.params.id
+            console.log(id)
+        })
+
+        app.delete('/visas/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await visaCollection.deleteOne(query);
+            return res.send(result)
         })
 
         await client.db("userDB").command({ ping: 1 });
@@ -69,9 +128,9 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req, res) => {
-    res.send('hello world')
-})
+// app.get('/', (req, res) => {
+//     res.send('hello world')
+// })
 
 app.listen(port, () => {
     console.log(`Linstening to port ${port}`)
