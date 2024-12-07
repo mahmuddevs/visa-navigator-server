@@ -144,13 +144,28 @@ async function run() {
             return res.send(result)
         })
 
+        //Get All Visa Application By Email
+        app.post('/application/my-applications', async (req, res) => {
+            const { email } = req.body
+
+            const query = { email }
+
+            const applications = applicationCollection.find(query);
+            const result = await applications.toArray()
+
+            return res.send(result)
+        })
+
         //Add Visa Application
 
         app.post('/application/add', async (req, res) => {
             const data = req.body
-            const { countryName, email, firstName, lastName, appliedDate, fee } = data
+            const { countryName, countryImg, visaType, processingTime, fee, validity, applicationMethod, email, appliedDate } = data
+            const applicantsName = data.firstName + " " + data.lastName
+            const formData = { countryName, countryImg, visaType, processingTime, fee, validity, applicationMethod, applicantsName, email, appliedDate }
 
-            const query = { countryName, email, firstName, lastName, appliedDate, fee };
+
+            const query = { countryName, email, applicantsName, appliedDate, fee };
 
             const existing = await applicationCollection.findOne(query)
 
@@ -158,9 +173,17 @@ async function run() {
                 return res.send({ message: "Already Exists" })
             }
 
-            const result = await applicationCollection.insertOne({ ...data, createdAt: new Date() })
+            const result = await applicationCollection.insertOne({ ...formData, createdAt: new Date() })
             return res.send(result)
 
+        })
+
+        app.delete('/application/my-applications/:id', async (req, res) => {
+            const id = req.params.id
+
+            const query = { _id: new ObjectId(id) }
+            const result = await applicationCollection.deleteOne(query);
+            return res.send(result)
         })
 
         await client.db("userDB").command({ ping: 1 });
