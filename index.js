@@ -23,8 +23,8 @@ async function run() {
     try {
         await client.connect();
         const visaDB = client.db("VisaNavigation")
-        const userCollection = visaDB.collection('userCollection')
         const visaCollection = visaDB.collection('visaCollection')
+        const applicationCollection = visaDB.collection('applicationCollection')
 
         app.get('/users', async (req, res) => {
 
@@ -142,6 +142,25 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await visaCollection.deleteOne(query);
             return res.send(result)
+        })
+
+        //Add Visa Application
+
+        app.post('/application/add', async (req, res) => {
+            const data = req.body
+            const { countryName, email, firstName, lastName, appliedDate, fee } = data
+
+            const query = { countryName, email, firstName, lastName, appliedDate, fee };
+
+            const existing = await applicationCollection.findOne(query)
+
+            if (existing) {
+                return res.send({ message: "Already Exists" })
+            }
+
+            const result = await applicationCollection.insertOne({ ...data, createdAt: new Date() })
+            return res.send(result)
+
         })
 
         await client.db("userDB").command({ ping: 1 });
