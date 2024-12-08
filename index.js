@@ -26,26 +26,6 @@ async function run() {
         const visaCollection = visaDB.collection('visaCollection')
         const applicationCollection = visaDB.collection('applicationCollection')
 
-        app.get('/users', async (req, res) => {
-
-            const users = userCollection.find();
-            const result = await users.toArray()
-
-            res.send(result)
-        })
-        // app.get('/:id', async (req, res) => {
-        //     const id = req.params.id
-
-        //     const query = { _id: new ObjectId(id) }
-
-        //     const result = await userCollection.findOne(query);
-
-        //     res.send(result)
-        // })
-
-
-
-
         //Visa Routes
 
         //Get All Visas
@@ -97,6 +77,25 @@ async function run() {
             return res.send(result)
         })
 
+        //Get Visas By Visa Type
+        app.post('/visas/filter-by-visa-type', async (req, res) => {
+            const { visaType } = req.body
+
+            const query = { visaType }
+
+            if (visaType === "") {
+                const visas = visaCollection.find();
+                const result = await visas.toArray()
+                return res.send(result)
+            }
+
+            const visas = visaCollection.find(query);
+            const result = await visas.toArray()
+
+            return res.send(result)
+        })
+
+
         //Get Single Visa
         app.get('/visas/:id', async (req, res) => {
             const id = req.params.id
@@ -111,6 +110,7 @@ async function run() {
             const updatedData = req.body
 
             const { countryName, countryImg, visaType, processingTime, requiredDocuments, description, minAge, fee, validity, applicationMethod, user } = updatedData
+
 
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
@@ -133,8 +133,8 @@ async function run() {
 
             };
 
-            const result = await movies.updateOne(filter, updateDoc, options);
-
+            const result = await visaCollection.updateOne(filter, updateDoc, options);
+            return res.send(result)
         })
 
         app.delete('/visas/:id', async (req, res) => {
@@ -144,8 +144,10 @@ async function run() {
             return res.send(result)
         })
 
+
         //Get All Visa Application By Email
         app.post('/application/my-applications', async (req, res) => {
+
             const { email } = req.body
 
             const query = { email }
