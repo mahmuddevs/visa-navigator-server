@@ -3,11 +3,12 @@ import cors from 'cors'
 import 'dotenv/config'
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb'
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@merncluster.qifq6.mongodb.net/?retryWrites=true&w=majority&appName=MernCluster`;
+const uri = `mongodb+srv://Mahmud:UwXjArDawlIoAKgg@merncluster.qifq6.mongodb.net/?retryWrites=true&w=majority&appName=MernCluster`;
 
 const app = express()
 
 const port = process.env.PORT || 3002
+
 
 app.use(cors())
 app.use(express.json())
@@ -21,10 +22,14 @@ const client = new MongoClient(uri, {
 });
 async function run() {
     try {
-        await client.connect();
+        // await client.connect();
         const visaDB = client.db("VisaNavigation")
         const visaCollection = visaDB.collection('visaCollection')
         const applicationCollection = visaDB.collection('applicationCollection')
+
+        app.get('/', (req, res) => {
+            res.send('Server Is Running Fine')
+        })
 
         //Visa Routes
 
@@ -188,8 +193,8 @@ async function run() {
             return res.send(result)
         })
 
-        await client.db("userDB").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("visaDB").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
@@ -197,10 +202,6 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-// app.get('/', (req, res) => {
-//     res.send('hello world')
-// })
 
 app.listen(port, () => {
     console.log(`Linstening to port ${port}`)
