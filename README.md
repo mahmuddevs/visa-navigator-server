@@ -64,7 +64,7 @@ To securely manage environment variables, create a `.env` file in the root of yo
 
 ### Local Installation Guide
 
-Follow the steps below to set up and run the backend of the **ReadSphere Library Management System** locally:
+Follow the steps below to set up and run the project locally:
 
 1. **Clone the repository:**
 2. **Run npm install**
