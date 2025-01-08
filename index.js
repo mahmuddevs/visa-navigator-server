@@ -47,7 +47,7 @@ async function run() {
             const latestVisas = await visaCollection
                 .find()
                 .sort({ createdAt: -1 })
-                .limit(6).toArray();
+                .limit(5).toArray();
 
             return res.send(latestVisas)
         })
@@ -99,6 +99,21 @@ async function run() {
 
             return res.send(result)
         })
+
+        //sort visa
+        app.post('/visas/sort-by-price', async (req, res) => {
+            const { sort } = req.body
+
+            if (sort === "") {
+                const visas = visaCollection.find();
+                const result = await visas.toArray()
+                return res.send(result)
+            }
+
+            const visas = await visaCollection.find().sort({ fee: sort }).toArray()
+            return res.send(visas)
+        })
+
 
 
         //Get Single Visa
